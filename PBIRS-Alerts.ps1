@@ -167,11 +167,10 @@ ORDER BY
 $SMTPRelay = "smtp-relay.contoso.com"
 $From = "PBIRS Alerts<noreply@contoso.com>"
 $PBIManagers = "PBIManagers@contoso.com"
-$anonUsername = "anonymous"
-$anonPassword = ConvertTo-SecureString "anonymous" -AsPlainText -Force
-$AnonCredentials = New-Object System.Management.Automation.PSCredential($anonUsername, $anonPassword)
+$SMTPUsername = "anonymous"
+$SMTPPassword = ConvertTo-SecureString "anonymous" -AsPlainText -Force
+$SMTPCredential = New-Object System.Management.Automation.PSCredential($SMTPUsername, $SMTPPassword)
 $Subject = "PowerBI Report Server Failed Refreshes"
-$ReportDir = "C:\AuthorizedScripts\PBIRSrefresh"
 
 $ServerInstance = 'SQLServer.contoso.com\Instance'
 $Database = 'PBI_ReportServer'
@@ -217,7 +216,7 @@ For($i=0;$i -lt $UserHash.Count;$i++){
         $HTML = $Notifications | Select-Object * -ExcludeProperty RowError, RowState, Table, ItemArray, HasErrors | ConvertTo-Html -Head $CSS -PostContent $Footer
         $FileName = $($UserHash.Keys)[$i].ToString().Replace('contoso\','')
      
-        Send-MailMessage -From $From -to $($UserHash.Values)[$i] -Subject $Subject -Bodyashtml ($HTML|out-string) -SmtpServer $SMTPRelay -Credential $AnonCredentials -ErrorAction Stop
+        Send-MailMessage -From $From -to $($UserHash.Values)[$i] -Subject $Subject -Bodyashtml ($HTML|out-string) -SmtpServer $SMTPRelay -Credential $SMTPCredential -ErrorAction Stop
         }
     }
 
@@ -227,7 +226,7 @@ For($i=0;$i -lt $Alerts.Alert.Count;$i++){
         Write-Verbose "Failed Refresh Notification for: $($Alerts.Alert[$i].Email) regarding Path $($Alerts.Alert[$i].Path)"
         $Notifications = $FailedRefreshes.Group | Where-Object {$_.Path -like $Alerts.Alert[$i].Path}
         $HTML = $Notifications | Select-Object * -ExcludeProperty RowError, RowState, Table, ItemArray, HasErrors | ConvertTo-Html -Head $CSS -PostContent $Footer
-        Send-MailMessage -From $From -to $($Alerts.Alert[$i].Email) -Subject $Subject -Bodyashtml ($HTML|out-string) -SmtpServer $SMTPRelay -Credential $AnonCredentials -ErrorAction Stop
+        Send-MailMessage -From $From -to $($Alerts.Alert[$i].Email) -Subject $Subject -Bodyashtml ($HTML|out-string) -SmtpServer $SMTPRelay -Credential $SMTPCredential -ErrorAction Stop
         }
 
     }
@@ -235,4 +234,4 @@ For($i=0;$i -lt $Alerts.Alert.Count;$i++){
 
 ########## Team notification for all failures ##########
 $HTML = $FailedRefreshes.Group | Select-Object * -ExcludeProperty RowError, RowState, Table, ItemArray, HasErrors | ConvertTo-Html -Head $CSS -PostContent $Footer
-Send-MailMessage -From $From -to $PBIManagers -Subject $Subject -Bodyashtml ($HTML|out-string) -SmtpServer $SMTPRelay -Credential $AnonCredentials -ErrorAction Stop
+Send-MailMessage -From $From -to $PBIManagers -Subject $Subject -Bodyashtml ($HTML|out-string) -SmtpServer $SMTPRelay -Credential $SMTPCredential -ErrorAction Stop
