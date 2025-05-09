@@ -43,12 +43,6 @@ The goal of this projet is to create and email automated failure notifications i
 | ---- | ---- |
 | `None` | None |
 
-## Greater Specificity on alerting:
-**TBD**<br>
-- TBD
-> ```TBD```
-
-
 Scheduling:
 We currently schedule using a SQL Agent Job which runs daily:
 | Step Type | Step Text |
